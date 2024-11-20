@@ -1,0 +1,36 @@
+name: README.md 내용 읽기 워크플로우
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  read-readme:
+    # Ubuntu 최신 버전에서 작업을 실행합니다.
+    # runs-on은 GitHub Actions가 실행될 운영체제를 지정합니다.
+    # ubuntu-latest를 사용하면 안정적이고 최신 버전의 Ubuntu에서 실행됩니다.
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 저장소 체크아웃 할때
+        # actions/checkout은 현재 저장소의 코드를 가져오는 공식 GitHub Action입니다.
+        # v4는 최신 안정 버전을 의미하며, 더 나은 성능과 보안을 제공합니다.
+        # 이 단계가 없으면 워크플로우가 저장소의 코드에 접근할 수 없습니다.
+        uses: actions/checkout@v4
+
+      - name: Node.js 셋팅하기
+        # actions/setup-node는 Node.js 환경을 설정하는 공식 GitHub Action입니다.
+        # v4는 최신 안정 버전을 의미합니다.
+        uses: actions/setup-node@v4
+        with:
+          # with는 Action에 전달할 매개변수를 지정하는 섹션입니다.
+          # node-version: '20'은 Node.js의 LTS 버전을 사용하도록 지정합니다.
+          node-version: '20'
+
+      - name: workflow 디렉토리 형제관계에 있는 scripts 디렉토리에 있는 read-readme.js 파일 실행하기 
+        # run은 실행할 셸 명령어를 지정합니다.
+        # node 명령어로 JavaScript 파일을 실행합니다.
+        # | 문자는 여러 줄의 명령어를 실행할 수 있게 해줍니다.
+        run: |
+          node .github/scripts/read-readme.js
