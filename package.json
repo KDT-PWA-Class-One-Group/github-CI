@@ -1,0 +1,8 @@
+{
+  "name": "github-CI",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/KDT-PWA-Class-One-Group/github-CI.git",
+  "author": "kongukjae <51992661+kongukjae@users.noreply.github.com>",
+  "license": "MIT"
+}
