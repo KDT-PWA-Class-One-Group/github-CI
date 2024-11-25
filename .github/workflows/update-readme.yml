@@ -1,23 +1,40 @@
-name: README.md 내용 읽기 워크플로우
+name: README 커밋 로그 업데이트
 
 on:
   push:
     branches:
-      - main
+      - "*" # 모든 브랜치
 
 jobs:
-  read-readme:
+  update-readme:
     runs-on: ubuntu-latest
 
     steps:
-      - name: 저장소 체크아웃 할때
+      # 체크아웃 하는 이유는 최신 커밋 히스토리를 가져오기 위해서 적재하는 과정
+      # actions는 github에서 제공하는 패키지
+      - name: 저장소 체크아웃 
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # 전체 커밋 히스토리를 가져오기 위해 설정
 
-      - name: Node.js 셋팅하기
+      - name: Git 설정
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+
+      - name: Node.js 설정
         uses: actions/setup-node@v4
         with:
           node-version: '20'
 
-      - name: workflow 디렉토리 형제관계에 있는 scripts 디렉토리에 있는 read-readme.js 파일 실행하기 
+      - name: README 업데이트 스크립트 실행
+        run: node .github/scripts/update-readme.js
+
+      - name: 변경사항 커밋 및 푸시
         run: |
-          node .github/scripts/read-readme.js
+          git add README.md
+          git diff --quiet && git diff --staged --quiet || git commit -m "docs: README 커밋 로그 업데이트"
+          git push
+      # git diff --quiet: 작업 디렉토리의 변경사항 확인
+      # git diff --staged --quiet: 스테이징 영역의 변경사항 확인
+      # ||: 앞의 명령어들이 실패할 경우(= 변경사항이 있는 경우) 커밋 실행
