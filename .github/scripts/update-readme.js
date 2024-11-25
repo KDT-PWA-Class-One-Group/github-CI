@@ -8,9 +8,10 @@
  */
 
 // 필수 Node.js 모듈 불러오기
-const fs = require("fs");  // 파일 시스템 작업을 위한 모듈
 const path = require("path");  // 파일 경로 처리를 위한 모듈
 const { execSync } = require("child_process");  // Git 명령어 실행을 위한 모듈
+const { formatCommitsToTable } = require('./utils/commitFormatter');
+const FileReadWrite = require('./utils/FileReadWrite');
 
 /**
  * 파일 경로 설정
@@ -37,18 +38,17 @@ const readmePath = path.join(__dirname, "../../", "README.md");
  */
 
 try {
+  const fileHandler = new FileReadWrite(readmePath);
+  
   // Git 로그 가져오기
   const gitLog = execSync(
     'git log --pretty=format:"%h|%ad|%s" --date=format:"%Y-%m-%d"'
   ).toString();
 
-  const readmeContent = fs.readFileSync(readmePath, "utf8");
+  const readmeContent = fileHandler.readFile();
 
   // 커밋 로그를 테이블 형식으로 변환
-  const commits = gitLog.split("\n").map((line, index) => {
-    const [hash, date, message] = line.split("|");
-    return `| ${index + 1} | ${date} | ${hash} | ${message} |`;
-  });
+  const commits = formatCommitsToTable(gitLog);
 
   // 테이블 헤더 생성
   const tableHeader = `
@@ -59,7 +59,7 @@ try {
   const newContent = `${readmeContent}\n${tableHeader}\n${commits.join("\n")}`;
 
   // README.md 파일 업데이트
-  fs.writeFileSync(readmePath, newContent, "utf8");
+  fileHandler.writeFile(newContent);
 
   console.log("README.md 파일이 성공적으로 업데이트되었습니다.");
 } catch (error) {
